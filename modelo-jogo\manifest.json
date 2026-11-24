@@ -1,16 +1,16 @@
 {
-  "slug": "meu-jogo",
-  "title": "Nome do meu jogo",
-  "author": "Seu nome",
-  "authorClass": "Sua turma",
+  "slug": "douringo",
+  "title": "Douringo",
+  "author": "Celina",
+  "authorClass": "9C",
   "discipline": "Matemática",
-  "grades": ["6º", "7º"],
-  "tags": ["palavra-chave", "outra-palavra"],
-  "description": "Uma frase curta que explica o que o jogo ensina.",
-  "instructions": "Como jogar, em uma ou duas frases.",
-  "duration": 5,
+  "grades": ["6º ano", "7º ano", "8º ano", "9º ano"],
+  "tags": ["matemática", "multiplicação", "divisão", "potenciação", "raiz quadrada", "balões"],
+  "description": "Jogo de cálculo mental com balões coloridos sobre multiplicação, divisão, potenciação e raiz quadrada em 10 rodadas.",
+  "instructions": "Leia a conta na tela e clique no balão com a resposta certa. Você começa com 4 vidas e ganha 100 pontos a cada acerto.",
+  "duration": "3 min",
   "version": "1.0.0",
   "entry": "index.html",
   "cover": "cover.svg",
-  "createdAt": "2026-11-02"
+  "createdAt": "2026-11-24"
 }

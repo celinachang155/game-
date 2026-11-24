@@ -1,48 +1,113 @@
-<!doctype html>
-<html lang="pt-BR" data-theme="light">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light dark" />
-    <title>Modelo de Jogo — Jogos VR</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="app">
-      <header class="top">
-        <div>
-          <span class="kicker">Modelo</span>
-          <h1 id="title">Clique no Alvo</h1>
-          <p class="subtitle">Troque este jogo pelo seu. O contrato já está pronto.</p>
-        </div>
-        <button id="restart" class="btn" type="button">Reiniciar</button>
-      </header>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Douringo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Figurinhas fofinhas no fundo (desenhadas em SVG puro, sem imagens externas) -->
+  <div class="fundo-fofo" aria-hidden="true">
+    <svg class="figurinha estrela-1" viewBox="0 0 64 64">
+      <polygon points="32,4 39,23 59,23 43,35 49,55 32,43 15,55 21,35 5,23 25,23" fill="#ffd166" />
+      <circle cx="27" cy="29" r="2.2" fill="#3b2667" />
+      <circle cx="37" cy="29" r="2.2" fill="#3b2667" />
+      <path d="M29 34 Q32 37 35 34" stroke="#3b2667" stroke-width="2" fill="none" stroke-linecap="round" />
+    </svg>
 
-      <main>
-        <div class="hud">
-          <span class="pill">Alvos: <strong id="score">0</strong>/<span id="total">10</span></span>
-          <span class="pill">Tempo: <strong id="timer">0,0s</strong></span>
-        </div>
+    <svg class="figurinha nuvem-1" viewBox="0 0 100 60">
+      <path d="M25,45 H75 A15,15 0 0,0 75,15 A20,20 0 0,0 38,12 A15,15 0 0,0 25,45 Z" fill="#ffffff" opacity="0.75" />
+      <circle cx="44" cy="30" r="2" fill="#6b4fa3" />
+      <circle cx="56" cy="30" r="2" fill="#6b4fa3" />
+      <path d="M47 34 Q50 37 53 34" stroke="#6b4fa3" stroke-width="2" fill="none" stroke-linecap="round" />
+    </svg>
 
-        <div id="board" class="board" aria-label="Área do jogo">
-          <p id="start-hint" class="start-hint">Clique no alvo para começar</p>
-        </div>
-      </main>
+    <svg class="figurinha simbolo-1" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="26" fill="#ff9ebb" opacity="0.65" />
+      <text x="32" y="40" text-anchor="middle" font-size="28" font-weight="bold" fill="#3b2667">√x</text>
+    </svg>
 
-      <footer class="bottom">
-        <p>Este é o arquivo <code>game.js</code>. Leia os comentários e adapte.</p>
-      </footer>
-    </div>
+    <svg class="figurinha estrela-2" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="22" fill="#80ed99" opacity="0.65" />
+      <text x="32" y="40" text-anchor="middle" font-size="26" font-weight="bold" fill="#234d32">x²</text>
+    </svg>
+  </div>
 
-    <div id="result" class="overlay" hidden>
-      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="result-title">
-        <div class="modal-icon" aria-hidden="true">🎯</div>
-        <h2 id="result-title">Muito bem!</h2>
-        <p id="result-text">Você concluiu o jogo.</p>
-        <button id="play-again" class="btn btn-primary full" type="button">Jogar de novo</button>
+  <!-- Container principal do jogo (uma única tela) -->
+  <main class="cartao-jogo" id="app">
+    <header class="cabecalho">
+      <div class="titulo-area">
+        <h1>Douringo</h1>
+        <span class="subtitulo" id="indicador-rodada">Rodada 1 de 10</span>
       </div>
+
+      <div class="status-area">
+        <div class="caixa-status" aria-label="Vidas restantes">
+          <span class="rotulo">Vidas</span>
+          <span id="valor-vidas" class="valor-vidas">❤️❤️❤️❤️</span>
+        </div>
+        <div class="caixa-status" aria-label="Pontuação atual">
+          <span class="rotulo">Pontos</span>
+          <span id="valor-pontos" class="valor-pontos">0</span>
+        </div>
+        <button id="botao-tema" class="botao-icone" type="button" aria-label="Alternar tema claro ou escuro" title="Mudar tema">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <!-- Barra de progresso das 10 rodadas -->
+    <div class="barra-progresso-fundo" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="1" id="barra-progresso-container">
+      <div class="barra-progresso-preenchimento" id="barra-progresso"></div>
     </div>
 
-    <script src="game.js"></script>
-  </body>
+    <!-- Tela inicial rápida dentro da própria caixa -->
+    <section id="tela-inicio" class="secao-central">
+      <div class="mascote-boas-vindas" aria-hidden="true">🎈✨</div>
+      <h2>Pronta para estourar os balões certos?</h2>
+      <p>Resolva 10 desafios de multiplicação, divisão, potenciação e raiz quadrada. Você tem 4 vidas!</p>
+      <button id="botao-comecar" class="botao-principal" type="button">Começar Desafio</button>
+    </section>
+
+    <!-- Área ativa das perguntas e balões -->
+    <section id="tela-jogo" class="secao-jogo oculto">
+      <div class="etiqueta-tema" id="etiqueta-categoria">Multiplicação</div>
+      <div class="caixa-pergunta">
+        <p class="enunciado" id="texto-pergunta">Quanto é 7 × 8?</p>
+      </div>
+
+      <!-- Grade com os 4 balões clicáveis -->
+      <div class="grade-baloes" id="grade-baloes" role="group" aria-label="Opções de resposta em balões">
+        <!-- Os 4 balões são preenchidos pelo game.js -->
+      </div>
+
+      <!-- Caixa de explicação após cada resposta -->
+      <div id="caixa-feedback" class="caixa-feedback oculto" role="status" aria-live="polite">
+        <p id="texto-feedback" class="texto-feedback"></p>
+        <button id="botao-proximo" class="botao-principal" type="button">Próxima Rodada</button>
+      </div>
+    </section>
+
+    <!-- Tela final de resultado -->
+    <section id="tela-fim" class="secao-central oculto">
+      <div class="mascote-boas-vindas" id="icone-final" aria-hidden="true">🏆</div>
+      <h2 id="titulo-final">Parabéns!</h2>
+      <p id="mensagem-final">Você completou todas as rodadas!</p>
+      <div class="resumo-final">
+        <div class="item-resumo">
+          <span>Pontuação Final</span>
+          <strong id="pontos-finais">0</strong>
+        </div>
+        <div class="item-resumo">
+          <span>Acertos</span>
+          <strong id="acertos-finais">0 / 10</strong>
+        </div>
+      </div>
+      <button id="botao-reiniciar" class="botao-principal" type="button">Jogar Novamente</button>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
 </html>
